@@ -16,7 +16,7 @@ local config = {
     pin_plugins = nil, -- nil, true, false (nil will pin plugins on stable only)
     skip_prompts = false, -- skip prompts about breaking changes
     show_changelog = true, -- show the changelog after performing an update
-    auto_reload = false, -- automatically reload and sync packer after a successful update
+    auto_reload = true, -- automatically reload and sync packer after a successful update
     auto_quit = false, -- automatically quit the current session after a successful update
     -- remotes = { -- easily add new remotes to track
     --   ["remote_name"] = "https://remote_url.come/repo.git", -- full remote url
@@ -26,7 +26,7 @@ local config = {
   },
 
   -- Set colorscheme to use
-  colorscheme = "default_theme",
+  colorscheme = "onedark",
 
   -- Override highlight groups in any theme
   highlights = {
@@ -45,6 +45,7 @@ local config = {
   options = {
     opt = {
       relativenumber = true, -- sets vim.opt.relativenumber
+      hlsearch = false,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -61,9 +62,7 @@ local config = {
   -- end,
 
   -- Set dashboard header
-  header = {
-
-  },
+  header = {},
 
   -- Default theme configuration
   default_theme = {
@@ -98,7 +97,7 @@ local config = {
 
   -- Diagnostics configuration (for vim.diagnostics.config({...}))
   diagnostics = {
-    virtual_text = true,
+    virtual_text = false,
     underline = true,
   },
 
@@ -108,6 +107,7 @@ local config = {
     servers = {
       -- "pyright"
     },
+    skip_setup = { "dartls" },
     -- easily add or disable built in mappings added during LSP attaching
     mappings = {
       n = {
@@ -125,6 +125,16 @@ local config = {
 
     -- Add overrides for LSP server settings, the keys are the name of the server
     ["server-settings"] = {
+      dartls = {
+        -- any changes you want to make to the LSP setup, for example
+        color = {
+          enabled = true,
+        },
+        settings = {
+          showTodos = true,
+          completeFunctionCalls = true,
+        },
+      },
       -- example for addings schemas to yamlls
       -- yamlls = { -- override table for require("lspconfig").yamlls.setup({...})
       --   settings = {
@@ -172,6 +182,41 @@ local config = {
   -- Configure plugins
   plugins = {
     init = {
+      {
+        "ful1e5/onedark.nvim",
+        as = "onedark",
+        config = function() require("onedark").setup() end,
+      },
+      {
+        "akinsho/flutter-tools.nvim",
+        requires = "nvim-lua/plenary.nvim",
+        after = "mason-lspconfig.nvim", -- make sure to load after mason-lspconfig
+        config = function()
+          require("flutter-tools").setup {
+            lsp = astronvim.lsp.server_settings "dartls", -- get the server settings and built in capabilities/on_attach
+          }
+        end,
+      },
+      {
+        "ggandor/leap.nvim",
+        config = function() require("leap").set_default_keymaps(true) end,
+      },
+      -- {
+      --   "glacambre/firenvim",
+      --   run = function() vim.fn["firenvim#install"](0) end,
+      --   config = function()
+      --     require("flutter-tools").setup {
+      --       lsp = astronvim.lsp.server_settings "dartls", -- get the server settings and built in capabilities/on_attach
+      --     }
+      --   end,
+      -- },
+      {
+        "subnut/nvim-ghost.nvim",
+        config = function() require("onedark").setup() end,
+      },
+      {
+        "github/copilot.vim",
+      },
       -- You can disable default plugins as follows:
       -- ["goolord/alpha-nvim"] = { disable = true },
 
@@ -209,15 +254,15 @@ local config = {
       }
       -- set up null-ls's on_attach function
       -- NOTE: You can uncomment this on attach function to enable format on save
-      -- config.on_attach = function(client)
-      --   if client.resolved_capabilities.document_formatting then
-      --     vim.api.nvim_create_autocmd("BufWritePre", {
-      --       desc = "Auto format before save",
-      --       pattern = "<buffer>",
-      --       callback = vim.lsp.buf.formatting_sync,
-      --     })
-      --   end
-      -- end
+      config.on_attach = function(client)
+        if client.resolved_capabilities.document_formatting then
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            desc = "Auto format before save",
+            pattern = "<buffer>",
+            callback = vim.lsp.buf.formatting_sync,
+          })
+        end
+      end
       return config -- return final config table to use in require("null-ls").setup(config)
     end,
     treesitter = { -- overrides `require("treesitter").setup(...)`
@@ -225,7 +270,7 @@ local config = {
     },
     -- use mason-lspconfig to configure LSP installations
     ["mason-lspconfig"] = { -- overrides `require("mason-lspconfig").setup(...)`
-      -- ensure_installed = { "sumneko_lua" },
+      ensure_installed = { "dartls" },
     },
     -- use mason-tool-installer to configure DAP/Formatters/Linter installation
     ["mason-tool-installer"] = { -- overrides `require("mason-tool-installer").setup(...)`
@@ -281,6 +326,14 @@ local config = {
   -- augroups/autocommands and custom filetypes also this just pure lua so
   -- anything that doesn't fit in the normal config locations above can go here
   polish = function()
+    vim.keymap.del("t", "<esc>")
+    vim.keymap.del("t", "jk")
+    vim.keymap.del("t", "<C-h>")
+    vim.keymap.del("t", "<C-j>")
+    vim.keymap.del("t", "<C-k>")
+    vim.keymap.del("t", "<C-l>")
+    -- vim.keymap.del("n", "s")
+    -- vim.keymap.del("n", "S")
     -- Set key binding
     -- Set autocommands
     -- vim.api.nvim_create_augroup("packer_conf", { clear = true })
