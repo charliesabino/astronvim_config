@@ -1,6 +1,5 @@
 --              AstroNvim Configuration Table
 -- All configuration changes should go inside of the table below
-
 -- You can think of a Lua "table" as a dictionary like data structure the
 -- normal format is "key = value". These also handle array like data structures
 -- where a value with no key simply has an implicit numeric key
@@ -55,6 +54,9 @@ local config = {
       autopairs_enabled = true, -- enable autopairs at start
       diagnostics_enabled = true, -- enable diagnostics at start
       status_diagnostics_enabled = true, -- enable diagnostics in statusline
+      copilot_no_tab_map = true,
+      copilot_assume_mapped = true,
+      copilot_tab_fallback = "",
     },
   },
   -- If you need more control, you can use the function()...end notation
@@ -68,19 +70,7 @@ local config = {
   -- end,
 
   -- Set dashboard header
-  header = {
-    " █████  ███████ ████████ ██████   ██████",
-    "██   ██ ██         ██    ██   ██ ██    ██",
-    "███████ ███████    ██    ██████  ██    ██",
-    "██   ██      ██    ██    ██   ██ ██    ██",
-    "██   ██ ███████    ██    ██   ██  ██████",
-    " ",
-    "    ███    ██ ██    ██ ██ ███    ███",
-    "    ████   ██ ██    ██ ██ ████  ████",
-    "    ██ ██  ██ ██    ██ ██ ██ ████ ██",
-    "    ██  ██ ██  ██  ██  ██ ██  ██  ██",
-    "    ██   ████   ████   ██ ██      ██",
-  },
+  header = {},
 
   -- Default theme configuration
   default_theme = {
@@ -202,12 +192,19 @@ local config = {
       ["<leader>bc"] = { "<cmd>BufferLinePickClose<cr>", desc = "Pick to close" },
       ["<leader>bj"] = { "<cmd>BufferLinePick<cr>", desc = "Pick to jump" },
       ["<leader>bt"] = { "<cmd>BufferLineSortByTabs<cr>", desc = "Sort by tabs" },
+
       -- quick save
       -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
     },
     t = {
       -- setting a mapping to false will disable it
       -- ["<esc>"] = false,
+    },
+    v = {
+      ["p"] = { '"_dP' },
+    },
+    i = {
+      ["<C-cr>"] = { "copilot#Accept(<Tab>)", silent = true, expr = true, script = true },
     },
   },
 
@@ -233,6 +230,23 @@ local config = {
         "ggandor/leap.nvim",
         config = function() require("leap").set_default_keymaps(true) end,
       },
+      -- {
+      --   "zbirenbaum/copilot.lua",
+      --   event = "InsertEnter",
+      --   config = function()
+      --     vim.schedule(function() require("copilot").setup() end)
+      --   end,
+      -- },
+      -- {
+      --   "zbirenbaum/copilot-cmp",
+      --   after = { "copilot.lua" },
+      --   config = function()
+      --     require("copilot_cmp").setup {
+      --       method = "getCompletionsCycling",
+      --     }
+      --   end,
+      -- },
+      { "github/copilot.vim" },
 
       -- You can disable default plugins as follows:
       -- ["goolord/alpha-nvim"] = { disable = true },
@@ -272,7 +286,7 @@ local config = {
       return config -- return final config table
     end,
     treesitter = { -- overrides `require("treesitter").setup(...)`
-      -- ensure_installed = { "lua" },
+      ensure_installed = { "typescript", "rust", "python", "lua", "javascript" },
     },
     -- use mason-lspconfig to configure LSP installations
     ["mason-lspconfig"] = { -- overrides `require("mason-lspconfig").setup(...)`
@@ -302,7 +316,8 @@ local config = {
   -- true == 1000
   cmp = {
     source_priority = {
-      nvim_lsp = 1000,
+      copilot = 1000,
+      nvim_lsp = 900,
       luasnip = 750,
       buffer = 500,
       path = 250,
