@@ -1,1 +1,1 @@
-My config file for AstroNvim, featuring Onedark, Leap, custom bindings, and more.
+My config file for AstroNvim featuring onedark, leap.nvim, custom mappings, and more.
