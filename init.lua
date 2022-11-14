@@ -47,6 +47,7 @@ local config = {
       signcolumn = "auto", -- sets vim.opt.signcolumn to auto
       wrap = false, -- sets vim.opt.wrap
       hlsearch = false,
+      tabstop = 4,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -124,7 +125,7 @@ local config = {
   lsp = {
     -- enable servers that you already have installed without mason
     servers = {
-      -- "pyright"
+      -- "pyright",
     },
     formatting = {
       format_on_save = true, -- enable or disable auto formatting on save
@@ -161,6 +162,9 @@ local config = {
           showTodos = true,
           completeFunctionCalls = true,
         },
+      },
+      clangd = {
+        capabilities = { offsetEncoding = "utf-8" },
       },
 
       -- example for addings schemas to yamlls
@@ -247,6 +251,12 @@ local config = {
       --   end,
       -- },
       { "github/copilot.vim" },
+      { "MunifTanjim/nui.nvim" },
+      {
+        "xeluxee/competitest.nvim",
+        requires = "MunifTanjim/nui.nvim",
+        config = function() require("competitest").setup() end,
+      },
 
       -- You can disable default plugins as follows:
       -- ["goolord/alpha-nvim"] = { disable = true },
@@ -301,7 +311,9 @@ local config = {
   -- LuaSnip Options
   luasnip = {
     -- Add paths for including more VS Code style snippets in luasnip
-    vscode_snippet_paths = {},
+    vscode_snippet_paths = {
+      "./snippets",
+    },
     -- Extend filetypes
     filetype_extend = {
       -- javascript = { "javascriptreact" },
