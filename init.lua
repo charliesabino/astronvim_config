@@ -31,8 +31,7 @@ local config = {
   highlights = {
     -- init = { -- this table overrides highlights in all themes
     --   Normal = { bg = "#000000" },
-    -- }
-    -- duskfox = { -- a table of overrides/changes to the duskfox theme
+    -- } duskfox = { -- a table of overrides/changes to the duskfox theme
     --   Normal = { bg = "#000000" },
     -- },
   },
@@ -257,6 +256,7 @@ local config = {
         requires = "MunifTanjim/nui.nvim",
         config = function() require("competitest").setup() end,
       },
+      { "kylechui/nvim-surround", config = function() require("nvim-surround").setup() end },
 
       -- You can disable default plugins as follows:
       -- ["goolord/alpha-nvim"] = { disable = true },
